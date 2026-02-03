@@ -1,0 +1,25 @@
+name: Build Release Zip
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build zip
+        run: |
+          EXTENSION_KEY=mailchimpsync_names
+          TAG="${GITHUB_REF_NAME}"
+          ZIP_NAME="${EXTENSION_KEY}-${TAG}.zip"
+          git archive --format=zip --prefix="${EXTENSION_KEY}/" -o "${ZIP_NAME}" "${GITHUB_REF_NAME}"
+          echo "ZIP_NAME=${ZIP_NAME}" >> "$GITHUB_ENV"
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_NAME }}
