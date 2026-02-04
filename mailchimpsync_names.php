@@ -110,33 +110,15 @@ function mailchimpsync_names__name_sync($event) {
   $list_id = (string) $cache_entry->mailchimp_list_id;
 
   if ($cache_entry->mailchimp_status !== 'subscribed') {
-    Civi::log()->debug('MailchimpsyncNames: skip (not subscribed)', [
-      'cache_id' => $cache_id,
-      'civicrm_contact_id' => $contact_id,
-      'list_id' => $list_id,
-      'reason' => 'not_subscribed',
-    ]);
     return;
   }
 
   if (empty($cache_entry->mailchimp_member_id)) {
-    Civi::log()->debug('MailchimpsyncNames: skip (no member id)', [
-      'cache_id' => $cache_id,
-      'civicrm_contact_id' => $contact_id,
-      'list_id' => $list_id,
-      'reason' => 'missing_member_id',
-    ]);
     return;
   }
 
   $contact = $event->pre_data['mcs_name_sync']['contacts'][$contact_id] ?? NULL;
   if (!$contact) {
-    Civi::log()->debug('MailchimpsyncNames: skip (no contact data)', [
-      'cache_id' => $cache_id,
-      'civicrm_contact_id' => $contact_id,
-      'list_id' => $list_id,
-      'reason' => 'no_contact_data',
-    ]);
     return;
   }
 
@@ -145,24 +127,12 @@ function mailchimpsync_names__name_sync($event) {
   $has_name = ($first_name !== '' || $last_name !== '');
 
   if (!$has_name) {
-    Civi::log()->debug('MailchimpsyncNames: skip (no name data)', [
-      'cache_id' => $cache_id,
-      'civicrm_contact_id' => $contact_id,
-      'list_id' => $list_id,
-      'reason' => 'no_name_data',
-    ]);
     return;
   }
 
   $primary_email = isset($contact['primary_email']) ? trim((string) $contact['primary_email']) : '';
   $mailchimp_email = isset($cache_entry->mailchimp_email) ? trim((string) $cache_entry->mailchimp_email) : '';
   if ($primary_email !== '' && strcasecmp($primary_email, $mailchimp_email) !== 0) {
-    Civi::log()->debug('MailchimpsyncNames: skip (email mismatch)', [
-      'cache_id' => $cache_id,
-      'civicrm_contact_id' => $contact_id,
-      'list_id' => $list_id,
-      'reason' => 'email_mismatch',
-    ]);
     return;
   }
 
@@ -190,12 +160,6 @@ function mailchimpsync_names__name_sync($event) {
   }
 
   if (empty($changed_fields)) {
-    Civi::log()->debug('MailchimpsyncNames: skip (no name changes)', [
-      'cache_id' => $cache_id,
-      'civicrm_contact_id' => $contact_id,
-      'list_id' => $list_id,
-      'reason' => 'no_changes',
-    ]);
     return;
   }
 
